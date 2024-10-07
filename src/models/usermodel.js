@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new Schema({
     username: {
@@ -38,6 +39,11 @@ const userSchema = new Schema({
         type: String, //cloudnary url
         required: true,
     },
+
+    refreshToken: {
+        type: String,
+    },
+
     watchHistory: [
         {
             type: Schema.Types.ObjectId,
@@ -47,11 +53,11 @@ const userSchema = new Schema({
 
 }, { timestamps: true });
 
-userSchema.pre("save", function (next) {
+userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
         return next();
     }
-    this.password = bcrypt.hashSync(this.password, 10);
+    this.password = await bcrypt.hashSync(this.password, 10);
     next();
 });
 
